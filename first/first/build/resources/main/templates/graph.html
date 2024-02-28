@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Chart</title>
+    <!-- Include Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        .chart-container {
+            width: 100%; /* Adjust width as needed */
+            height: 100%; /* Adjust height as needed */
+            z-index: 1;
+            left: 150px;
+            position: absolute;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items:center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+
+        #menu {
+            cursor: crosshair;
+        }
+
+        .menu-circle {
+            width: 50px;
+            height: 50px;
+            background-color: #333;
+            border-radius: 50%;
+            transition: width 0.3s, height 0.3s;
+            top: 5%;
+            left: 3%;
+            position: fixed;
+        }
+
+        .menu-square {
+            border-radius: 25px;
+            width: 150px;
+            height: 750px;
+            background-color: #333;
+            transition: width 0.3s, height 0.7s;
+            top: 5%;
+            left: 3%;
+            position: fixed;
+        }
+    </style>
+</head>
+<body>
+    <div onmouseover="expandMenu()" onmouseout="collapseMenu()">
+        <div id="menu" class="menu-circle" style="text-align: center;">
+            <div id="menu-content" style="display: none;">
+                <a href="/" style="color: blanchedalmond;">Initial Page</a><br>
+                <a href="/temper" style="color: bisque;">Back</a><br>
+                <!--Form for choosing Date Range of Chart and Unit to display-->
+                <form id="graphForm" action="graph" method="get" >
+                    <label for="startdate" style="color: aliceblue;">Start Date
+                        <input name="startdate" type="date" id="startdate" max="2024-02-04" min="2000-01-01" value="2000-01-01">
+                    </label><br>
+                    <label for="enddate" style="color: aliceblue;">End Date
+                        <input name="enddate" type="date" id="enddate" max="2024-02-04" min="2000-01-01" value="2000-12-31">         
+                    </label><br>
+                    <select name="unit">Unit
+                        <option value=1 selected>Day</option>
+                        <option value=2>Week</option>
+                        <option value=3>Month</option>
+                        <option value=4>QuarterYear</option>
+                        <option value=5>Year</option>
+                    </select><br>
+                    <input type="submit" value="Send">
+                </form>
+            </div>
+        </div>
+    </div>
+    <!--Canvas for Chart. Chart.js object will populate this-->
+    <canvas id="myChart" class="chart-container"></canvas>
+<!--Script For Chart-->
+<script th:inline="JavaScript">
+    // Function to create the chart
+    function createChart(labels, data,lowdata,highdata,differdata) {
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Avg Temperature',
+                    data: data,
+                    backgroundColor: 'rgba(109, 154, 89, 0.2)',
+                    borderColor: 'rgba(109, 154, 89, 1)',
+                    borderWidth: 0.7
+                },
+                {
+                    label: 'Low Temperature',
+                    data: lowdata,
+                    backgroundColor: 'rgba(6, 114, 165, 0.2)',
+                    borderColor: 'rgba(6, 114, 165, 1)',
+                    borderWidth: 0.7,
+                    hidden: true
+                },
+                {
+                    label: 'High Temperature',
+                    data: highdata,
+                    backgroundColor: 'rgba(219, 98, 123, 0.2)',
+                    borderColor: 'rgba(219, 98, 123, 1)',
+                    borderWidth: 0.7,
+                    hidden: true
+                },
+                {
+                    label: 'Temperature Difference',
+                    data: differdata,
+                    backgroundColor: 'rgba(172, 93, 177, 0.2)',
+                    borderColor: 'rgba(172, 93, 177, 1)',
+                    borderWidth: 0.7,
+                    hidden: true
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time',
+                        time: {
+                            parser: 'yyyy-MM-dd',
+                            unit: 'day',
+                            tooltipFormat: 'yyyy-MM-dd',
+                            displayFormats: {
+                                day: 'yyyy-MM-dd'
+                            },
+                        },
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        },
+                        ticks: {
+                            display: true,
+                            maxRotation: 45, // Ensure x-axis labels are not rotated
+                            autoSkip: true, // Enable auto-skipping of labels
+                        },
+                        grid:{
+                            display: false 
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        }
+                    }
+                }     
+            }
+        }); 
+    }
+    //Functions for Changable Menu
+    function expandMenu() {
+        document.getElementById('menu').classList.remove('menu-circle');
+        document.getElementById('menu').classList.add('menu-square');
+        document.getElementById('menu-content').style.display = "block";
+    }
+    function collapseMenu() {
+        document.getElementById('menu').classList.remove('menu-square');
+        document.getElementById('menu').classList.add('menu-circle');
+        document.getElementById('menu-content').style.display = "none";
+    }
+    // Function to get URL parameter by name
+    function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+    // Populate unit, start date and end date from URL parameters
+    document.getElementById("startdate").value = getUrlParameter("startdate");
+    document.getElementById("enddate").value = getUrlParameter("enddate");
+    var selectedUnit = getUrlParameter("unit");
+   
+    var selectElement = document.getElementsByName("unit")[0];  // Get the <select> element
+    var optionElements = selectElement.getElementsByTagName("option"); // Get all the <option> elements inside the <select> element
+    // Loop through each <option> element to find the one you want to select
+    for (var i = 0; i < optionElements.length; i++) {
+        if (optionElements[i].value == selectedUnit) optionElements[i].selected = true;
+        else optionElements[i].selected = false;
+    }
+    document.getElementById('graphForm').style.display = false;
+
+    const labels = /*[[${labels}]]*/ [];
+    const data = /*[[${data}]]*/ [];
+    const lowdata = /*[[${lowdata}]]*/ [];
+    const highdata = /*[[${highdata}]]*/ [];
+    const differdata = /*[[${differdata}]]*/ [];
+
+    // Call the function to create the chart
+    createChart(labels, data,lowdata,highdata,differdata);
+</script>
+<!--Script For Alert if Boundary is Wrong-->
+<script>
+    if("[[${errorMessage}]]" != ""){
+        alert("[[${errorMessage}]]");
+    }
+</script>
+</body>
+</html>

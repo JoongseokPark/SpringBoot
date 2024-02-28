@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Effects Testing</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        canvas {
+            border: 2px solid #000;
+        }
+        .background{
+            position: relative;
+        }
+        .circle {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            background-color: #333;
+            border-radius: 50%;
+            transition: width 0.3s, height 0.3s;
+        }
+        .square {
+            position: absolute;
+            border-radius: 25px;
+            width: 250px;
+            height: 250px;
+            background-color: #333;
+            transition: width 0.3s, height 0.7s;
+        }
+        .childCircle{
+            position: relative;
+            top: 50%;
+            left: 50%;
+            width: 50px;
+            height: 50px;
+            background-color: #857f7f;
+            border-radius: 50%;
+            transition: width 0.2s, height 0.2s;
+        }
+    </style>
+</head>
+<body>
+    <!--
+    <a href="/">Back</a>
+    <button onclick="Checking_Point()">SavePoint</button><br>
+    -->
+    <!--<canvas id="aimCanvas" width="800" height="600" style="cursor: crosshair;"></canvas>-->
+
+    <div id ="OutShell" class="background" onmouseover="Change()" onmouseout="back()">
+        <div id="OuterFigure" class="circle">
+            <div id="FirstInner" class="childCircle" 
+                style="display: none;" onmouseover="Bigger(this.id)"></div>
+        </div>
+    </div>
+    <div ></div>
+
+    <script lang="JavaScript">
+        const div1 = document.getElementById('OuterFigure');
+        div1.addEventListener("animationend",AnimationEnd);
+        div1.addEventListener("animationstart", AnimationStart);
+
+        function AnimationEnd(){
+            document.getElementById('FirstInner').style.display = "block";
+        }
+        function AnimationStart(){
+            console.log("Animation Started");
+        }
+
+        function Change(){
+            document.getElementById('OuterFigure').classList.remove('circle');
+            document.getElementById('OuterFigure').classList.add('square');
+            document.getElementById('FirstInner').style.display = "block";
+        }
+        function back(){
+            document.getElementById('OuterFigure').classList.remove('square');
+            document.getElementById('OuterFigure').classList.add('circle');
+            document.getElementById('FirstInner').style.display = "none";
+        }
+        async function Bigger(id){
+            document.getElementById(id).style.width += "100px";
+            document.getElementById(id).style.height += "100px";
+            await new Promise((resolve, reject) => setTimeout(resolve, 3000));
+            document.getElementById(id).style.width -= "100px"
+            document.getElementById(id).style.heights -= "100px"
+        }
+
+    </script>
+
+    <script>
+        const canvas = document.getElementById('aimCanvas');
+        const ctx = canvas.getContext('2d');
+    
+        // Draw a target at a random location
+        function drawTarget() {
+            const targetSize = 30; // You can adjust the size of the target as needed
+            const targetX = Math.random() * (canvas.width - targetSize * 2) + targetSize;
+            const targetY = Math.random() * (canvas.height - targetSize * 2) + targetSize;
+    
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
+            ctx.beginPath();
+            ctx.arc(targetX, targetY, targetSize, 0, Math.PI * 2);
+            ctx.fillStyle = 'gray';
+            ctx.fill();
+            ctx.closePath();
+        }
+    
+        // Handle mouse click
+        canvas.addEventListener('click', function(event) {
+            const rect = canvas.getBoundingClientRect();
+            const mouseX = event.clientX - rect.left;
+            const mouseY = event.clientY - rect.top;
+    
+            const targetSize = 30; // Assuming the same size for the target
+            // Check if click is within the target
+            if (
+                mouseX >= targetX - targetSize &&
+                mouseX <= targetX + targetSize &&
+                mouseY >= targetY - targetSize &&
+                mouseY <= targetY + targetSize
+            ) {
+                console.log('Hit!');
+            } else {
+                console.log('Miss!');
+            }
+    
+            drawTarget(); // Draw a new target
+        });
+    
+        // Initial draw
+        drawTarget();
+    </script>
+    <script th:inline="JavaScript">
+
+        //display console Logs (current Time) and (Time from last checking point)
+        function Checking_Point(){
+            var clock = Date().toString();
+            if(lastTime == null) lastTime = Date();
+            var TimeGap = Date() - lastTime;
+            console.log(clock+"\n"+LastTime);
+            lastTime = Date();
+        }    
+        // This should be The Time from last time that Checking_Point() called
+        var lastTime = Date();
+    </script>
+</body>
+</html>

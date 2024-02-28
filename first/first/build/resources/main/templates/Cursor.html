@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Moving Square</title>
+<style>
+  body {
+    margin: 0;
+    padding: 0;
+    position: relative;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .container {
+    position: relative;
+    top: 200px;
+    left: 0%;
+  }
+
+  .square {
+    width: 50px;
+    height: 50px;
+    background-color: blue;
+    position: absolute;
+    top: -400px;
+    left: -25px;;
+  }
+
+  .button {
+    position: absolute;
+    cursor: pointer;
+    background-color: lightblue;
+    border: none;
+    padding: 8px 12px;
+    font-size: 14px;
+    transition: background-color 0.3s;
+    width: 80px;
+    height: 40px;
+  }
+
+  .button:hover, .button:focus {
+    background-color: skyblue;
+  }
+
+  #up {
+    top: calc(50% - 60px);
+    left: calc(50% - 40px);
+  }
+
+  #down {
+    top: calc(50% + 20px);
+    left: calc(50% - 40px);
+  }
+
+  #left {
+    top: calc(50% - 20px);
+    left: calc(50% - 120px);
+  }
+
+  #right {
+    top: calc(50% - 20px);
+    left: calc(50% + 40px);
+  }
+
+  #info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 14px;
+  }
+
+  /* Styling for the link */
+  .initial-page-link {
+    position: absolute;
+    top: 10px; /* Adjust the top position as needed */
+    left: 10px; /* Adjust the left position as needed */
+  }
+  .cordinate_presenter {
+    position: relative;
+    top: 10px; /* Adjust the top position as needed */
+    left: 30px; /* Adjust the left position as needed */
+  }
+</style>
+</head>
+<body>
+
+<a href="/" class="initial-page-link">Initial Page</a>
+<b class="cordinate_presenter" id="window.getComputedStyle(document.querySelector('.square'))"></b>
+
+<div class="container">
+    <div class="square"></div>
+    <button id="up" class="button" onclick="move('up')">Up</button>
+    <button id="down" class="button" onclick="move('down')">Down</button>
+    <button id="left" class="button" onclick="move('left')">Left</button>
+    <button id="right" class="button" onclick="move('right')">Right</button>
+  </div>
+
+  <script>
+    var intervalId; // Global variable to store interval ID for continuous movement
+  
+    function move(direction,speed) {
+      var square = document.querySelector('.square');
+      var currentPosition = window.getComputedStyle(square);
+      var currentTop = parseInt(currentPosition.top);
+      var currentLeft = parseInt(currentPosition.left);
+  
+      switch (direction) {
+        case 'up':
+          square.style.top = currentTop - speed + 'px';
+          break;
+        case 'down':
+          square.style.top = currentTop + speed + 'px';
+          break;
+        case 'left':
+          square.style.left = currentLeft - speed + 'px';
+          break;
+        case 'right':
+          square.style.left = currentLeft + speed + 'px';
+          break;
+      }
+    }
+  
+    // Add event listeners for mouseover, mouseout, and click events
+    document.querySelectorAll('.button').forEach(function(button) {
+      button.addEventListener('mouseover', function() {
+        if(event.buttons == 1) speed = 4;
+        else speed = 1;
+        var direction = this.id;
+        intervalId = setInterval(function() {
+          move(direction,speed);
+        }, 10);
+      });
+  
+      button.addEventListener('mouseout', function() {
+        clearInterval(intervalId);
+      });
+    });
+  </script>
+
+</body>
+</html>

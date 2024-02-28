@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temper Data</title>
+    <style>
+        .hover {
+            background-color: #bff0ff;
+        }
+        .hover-box {
+            width: 200px;
+            height: 100px;
+            padding: 10px;
+            background-color: #41a6cd73;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="initial-page-link">Initial Page</a>
+    <a href="/graph">Make Visualization</a>
+    
+    <table id='table' border="1">
+        <thead>
+            <tr>
+                <th>Record Date</th>
+                <th>Average Temperature</th>
+                <th>Min Temperature</th>
+                <th>Max Temperature</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Use Thymeleaf to iterate over the list of entities and populate the table -->
+            <tr th:each="entity : ${temperData}">
+                <td class="cell" th:text="${entity.recordAt}"></td>
+                <td class="cell" th:text="${entity.avgTmp}"></td>
+                <td class="cell" th:text="${entity.minTmp}"></td>
+                <td class="cell" th:text="${entity.maxTmp}"></td>
+            </tr>
+        </tbody>
+    </table>
+    <script th:inline="JavaScript">
+    document.addEventListener('DOMContentLoaded', function() {
+    var cells = document.querySelectorAll('#table td');
+        cells.forEach(function(cell) {
+            
+            cell.addEventListener('mouseover', function() {
+                // Handle mouseover event for each cell
+                this.classList.add('hover'); // Add a class to highlight the cell
+                const hoverBox = createHoverBox(this.textContent);
+
+                // Append the box to the document body
+                document.body.appendChild(hoverBox);
+
+                // Position the box initially (update later)
+                const initialX = event.clientX;
+                const initialY = event.clientY;
+                hoverBox.style.left = `${initialX}px`;
+                hoverBox.style.top = `${initialY}px`;
+            });
+
+            cell.addEventListener('mouseout', function() {
+                // Handle mouseout event for each cell
+                this.classList.remove('hover'); // Remove the class when mouse leaves the cell
+                const hoverBox = document.querySelector('.hover-box');
+                if (hoverBox) {
+                hoverBox.remove();
+                }
+                console.log("Box Deleted!");
+            });
+
+            cell.addEventListener('mousemove', (event) => {
+                // Update box position based on current mouse coordinates
+                const hoverBox = document.querySelector('.hover-box');
+                if (hoverBox) { // Check if box exists
+                    hoverBox.style.left = `${event.clientX}px`;
+                    hoverBox.style.top = `${event.clientY}px`;
+                }
+            });
+
+        });
+    });
+
+    function createHoverBox(content) {
+        // Create a new div element
+        const hoverBox = document.createElement('div');
+
+        // Add appropriate CSS class(es) for styling
+        hoverBox.classList.add('hover-box');
+
+        // Set initial content (modify as needed)
+        hoverBox.textContent = content;
+
+        console.log("Box Created!",hoverBox.style.left,hoverBox.style.top);
+        // Return the created element
+        return hoverBox;
+    }
+    </script>
+</body>
+</html>

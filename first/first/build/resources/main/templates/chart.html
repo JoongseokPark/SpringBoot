@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chart.js Date Adapter Example</title>
+    <!-- Import Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <!-- Import Date Adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        /* CSS styles here */
+        .chart_style{
+            height: 100%;
+            width: 400px;
+            overflow-x: scroll;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" style="text-align: center;font-size: large;">Initial</a>
+    <hr>
+    <!-- Chart container -->
+    <div>
+        <canvas id="myChart" class="chart_style"></canvas>
+    </div>
+    <!-- JavaScript code for the chart -->
+    <script>
+        // Data for the chart
+        const labels = ['2024-02-01', '2024-02-02', '2024-02-03', '2024-02-04', '2024-02-05', '2024-02-06', '2024-02-07'];
+        const data = [10, 20, 15, 25, 30, 11, 32];
+
+        console.log(typeof(labels));
+        console.log(labels[1]);
+        console.log(data);
+
+        // Create the chart
+        const ctx = document.getElementById('myChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Temperature',
+                    data: data,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    x: {
+                        type: 'time', // Use 'time' scale for dates
+                        time: {
+                            parser: 'yyyy-mm-dd', // Date format
+                            //tooltipFormat: 'll', // Tooltip format
+                            unit: 'day' // Display unit (e.g., 'day', 'week', 'month')
+                        },
+                        title: {
+                            display: true,
+                            text: 'Date'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Temperature (°C)'
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
